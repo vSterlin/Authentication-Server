@@ -3,7 +3,7 @@ package user
 import (
 	"fmt"
 
-	"golang.org/x/crypto/scrypt"
+	"golang.org/x/crypto/bcrypt"
 )
 
 type AuthService struct {
@@ -17,10 +17,8 @@ func NewAuthService(us *UserService) *AuthService {
 func (as *AuthService) SignUp(u *User) *User {
 	// TODO find if user with email exists
 
-	// generate random
-	salt := "asdasd"
-	// do password hashing
-	hp, err := scrypt.Key([]byte(u.Password), []byte(salt), 32768, 8, 1, 32)
+	hp, err := bcrypt.GenerateFromPassword([]byte(u.Password), bcrypt.DefaultCost)
+
 	if err != nil {
 		fmt.Println(err)
 	}
