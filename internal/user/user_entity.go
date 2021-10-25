@@ -1,8 +1,8 @@
 package user
 
 type User struct {
-	FirstName string
-	LastName  string
-	Username  string
-	Password  string
+	FirstName string `json:"firstName"`
+	LastName  string `json:"lastName"`
+	Username  string `json:"username"`
+	Password  string `json:"password"` // will omit later
 }
