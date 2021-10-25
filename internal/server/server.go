@@ -33,6 +33,7 @@ func (s *Server) Init() {
 	r.Route("/users", func(r chi.Router) {
 		r.Get("/", uc.GetUsers)
 		r.Post("/signup", uc.SignUp)
+		r.Post("/signin", uc.SignIn)
 	})
 
 	http.ListenAndServe(":"+s.addr, r)

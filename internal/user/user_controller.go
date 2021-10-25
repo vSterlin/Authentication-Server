@@ -25,3 +25,14 @@ func (uc *UserController) SignUp(w http.ResponseWriter, r *http.Request) {
 	u = uc.as.SignUp(u)
 	json.NewEncoder(w).Encode(u)
 }
+
+func (uc *UserController) SignIn(w http.ResponseWriter, r *http.Request) {
+	u := &User{}
+	json.NewDecoder(r.Body).Decode(&u)
+	u, err := uc.as.SignIn(u.Email, u.Password)
+	if err != nil {
+		json.NewEncoder(w).Encode(err.Error())
+		return
+	}
+	json.NewEncoder(w).Encode(u)
+}

@@ -8,7 +8,7 @@ import (
 )
 
 var mockUsers = []*User{
-	{1, "Vladimir", "Sterlin", "vSterlin", "hashedPassword"},
+	{1, "Vladimir", "Sterlin", "vSterlin", "v@v.com", "hashedPassword"},
 }
 
 type mockRepo struct {
@@ -20,6 +20,15 @@ func (mr *mockRepo) GetMany() []*User {
 
 func (mr *mockRepo) GetOne(id int) *User {
 	return users[id-1]
+}
+
+func (ur *mockRepo) GetOneByEmail(email string) *User {
+	for _, u := range users {
+		if u.Email == email {
+			return u
+		}
+	}
+	return nil
 }
 
 func (mr *mockRepo) InsertOne(u *User) *User {

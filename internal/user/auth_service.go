@@ -1,6 +1,7 @@
 package user
 
 import (
+	"errors"
 	"fmt"
 
 	"golang.org/x/crypto/bcrypt"
@@ -26,4 +27,15 @@ func (as *AuthService) SignUp(u *User) *User {
 	u.Password = string(hp)
 	u = as.us.InsertOne(u)
 	return u
+}
+
+func (as *AuthService) SignIn(email string, password string) (*User, error) {
+	u := as.us.GetOneByEmail(email)
+	err := bcrypt.CompareHashAndPassword([]byte(u.Password), []byte(password))
+
+	if err != nil {
+		return nil, errors.New("wrong email and password combination")
+	}
+	return u, nil
+
 }
