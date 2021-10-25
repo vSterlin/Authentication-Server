@@ -11,3 +11,11 @@ func NewUserService(ur UserRepo) *UserService {
 func (us *UserService) GetMany() []*User {
 	return us.ur.GetMany()
 }
+
+func (us *UserService) GetOne(id int) *User {
+	return us.ur.GetOne(id)
+}
+
+func (us *UserService) InsertOne(u *User) *User {
+	return us.ur.InsertOne(u)
+}

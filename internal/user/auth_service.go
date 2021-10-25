@@ -9,5 +9,7 @@ func NewAuthService(us *UserService) *AuthService {
 }
 
 func (as *AuthService) SignUp(u *User) *User {
-	// insert
+	// do password hashing
+	u = as.us.InsertOne(u)
+	return u
 }
