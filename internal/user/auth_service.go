@@ -36,6 +36,7 @@ func (as *AuthService) SignIn(email string, password string) (*User, error) {
 	if err != nil {
 		return nil, errors.New("wrong email and password combination")
 	}
+
 	return u, nil
 
 }
