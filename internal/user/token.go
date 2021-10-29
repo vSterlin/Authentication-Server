@@ -7,6 +7,30 @@ import (
 	"github.com/golang-jwt/jwt"
 )
 
+const (
+	ACCESS_TOKEN = iota
+	REFRESH_TOKEN
+)
+
+type claims struct {
+	Id       int    `json:"id"`
+	Username string `json:"username"`
+	Email    string `json:"email"`
+	jwt.StandardClaims
+}
+
+func newClaims(u *User, exp int64) *claims {
+	return &claims{
+		u.Id,
+		u.Username,
+		u.Email,
+		jwt.StandardClaims{
+			ExpiresAt: exp,
+			Issuer:    "vSterlin",
+		},
+	}
+}
+
 func newCookie(n string, v string) *http.Cookie {
 	return &http.Cookie{
 		Name:  n,
@@ -16,30 +40,32 @@ func newCookie(n string, v string) *http.Cookie {
 	}
 }
 
-func newClaims(u *User) *jwt.MapClaims {
-	return &jwt.MapClaims{
-		"id":       u.Id,
-		"username": u.Username,
-		"email":    u.Email,
+func generateRefreshTokenCookie(u *User) *http.Cookie {
+
+	rtSecret := []byte("REFRESH_TOKEN")
+	c := newClaims(u, 100)
+
+	rt := jwt.NewWithClaims(jwt.SigningMethodHS256, c)
+	rtStr, err := rt.SignedString(rtSecret)
+	if err != nil {
+		fmt.Println(err.Error())
 	}
+
+	return newCookie("refresh_token", rtStr)
 }
 
 func generateAccesTokenCookie(u *User) *http.Cookie {
-	//TODO
 
-	atSecret := []byte("abcdefg")
+	atSecret := []byte("ACCESS_TOKEN")
+	c := newClaims(u, 1)
 
-	at := jwt.NewWithClaims(jwt.SigningMethodHS256, newClaims(u))
+	at := jwt.NewWithClaims(jwt.SigningMethodHS256, c)
 	atStr, err := at.SignedString(atSecret)
 	if err != nil {
 		fmt.Println(err.Error())
 	}
-	return newCookie("access_token", atStr)
-}
 
-func generateRefreshTokenCookie(u *User) *http.Cookie {
-	//TODO
-	return newCookie("refresh_token", u.FirstName+u.Username+"refresh_token")
+	return newCookie("access_token", atStr)
 }
 
 func SetTokenCookies(w http.ResponseWriter, u *User) {
