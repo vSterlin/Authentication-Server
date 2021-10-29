@@ -6,6 +6,7 @@ import (
 
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
+	mw "github.com/vSterlin/auth/internal/middleware"
 	"github.com/vSterlin/auth/internal/user"
 )
 
@@ -29,11 +30,14 @@ func (s *Server) Init() {
 	r := chi.NewRouter()
 
 	r.Use(middleware.Logger)
+	r.Use(mw.CurrentUser)
 
 	r.Route("/users", func(r chi.Router) {
+
 		r.Get("/", uc.GetUsers)
 		r.Post("/signup", uc.SignUp)
 		r.Post("/signin", uc.SignIn)
+
 	})
 
 	http.ListenAndServe(":"+s.addr, r)

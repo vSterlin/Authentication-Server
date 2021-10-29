@@ -31,10 +31,10 @@ func newClaims(u *User, exp int64) *claims {
 	}
 }
 
-func newCookie(n string, v string) *http.Cookie {
+func newCookie(name string, value string) *http.Cookie {
 	return &http.Cookie{
-		Name:  n,
-		Value: v,
+		Name:  name,
+		Value: value,
 		// Secure:   true,
 		HttpOnly: true,
 	}
