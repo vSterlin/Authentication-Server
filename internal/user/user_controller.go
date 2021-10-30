@@ -43,3 +43,8 @@ func (uc *UserController) SignIn(w http.ResponseWriter, r *http.Request) {
 
 	je.Encode(u)
 }
+
+func (uc *UserController) GetCurrentUser(w http.ResponseWriter, r *http.Request) {
+	u := r.Context().Value(UserContext).(*User)
+	json.NewEncoder(w).Encode(u)
+}

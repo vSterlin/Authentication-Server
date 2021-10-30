@@ -37,6 +37,7 @@ func (s *Server) Init() {
 
 		// r.Get("/", uc.GetUsers)
 		r.With(am.IsAuthenticated).Get("/", uc.GetUsers)
+		r.Get("/current-user", uc.GetCurrentUser)
 		r.Post("/signup", uc.SignUp)
 		r.Post("/signin", uc.SignIn)
 
