@@ -34,8 +34,8 @@ func (s *Server) Init() {
 
 	r.Route("/users", func(r chi.Router) {
 
-		// r.With(mw.CurrentUser).Get("/", uc.GetUsers)
-		r.Get("/", uc.GetUsers)
+		// r.Get("/", uc.GetUsers)
+		r.With(mw.IsAuthenticated).Get("/", uc.GetUsers)
 		r.Post("/signup", uc.SignUp)
 		r.Post("/signin", uc.SignIn)
 
