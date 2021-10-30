@@ -3,13 +3,14 @@ package middleware
 import (
 	"encoding/json"
 	"net/http"
-	"os/user"
+
+	"github.com/vSterlin/auth/internal/user"
 )
 
 func IsAuthenticated(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
-		u := r.Context().Value("user").(*user.User)
+		u := r.Context().Value(user.UserContext).(*user.User)
 
 		if u == nil {
 			json.NewEncoder(w).Encode("Unauthorized")

@@ -4,7 +4,8 @@ import (
 	"context"
 	"fmt"
 	"net/http"
-	"os/user"
+
+	"github.com/vSterlin/auth/internal/user"
 )
 
 func CurrentUser(next http.Handler) http.Handler {
@@ -21,7 +22,7 @@ func CurrentUser(next http.Handler) http.Handler {
 		// }
 
 		var u *user.User
-		ctx := context.WithValue(r.Context(), "user", u)
+		ctx := context.WithValue(r.Context(), user.UserContext, u)
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
 }

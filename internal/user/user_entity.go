@@ -8,3 +8,7 @@ type User struct {
 	Email     string `json:"email"`
 	Password  string `json:"password"` // TODO will omit later
 }
+
+type context string
+
+var UserContext = context("user")
