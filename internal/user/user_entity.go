@@ -9,6 +9,6 @@ type User struct {
 	Password  string `json:"password"` // TODO will omit later
 }
 
-type context string
+type ctx string
 
-var UserContext = context("user")
+var UserContext = ctx("user")

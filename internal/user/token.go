@@ -1,6 +1,7 @@
 package user
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
 
@@ -68,14 +69,22 @@ func generateAccesTokenCookie(u *User) *http.Cookie {
 	return newCookie("access_token", atStr)
 }
 
-func ParseToken(c *http.Cookie) *User {
-	// at, _ := jwt.Parse(cookie.Value, func(at *jwt.Token) (interface{}, error) {
-	// 	return []byte("ACCESS_TOKEN"), nil
-	// })
+func ParseToken(cookie *http.Cookie) (*claims, error) {
+	at, err := jwt.ParseWithClaims(cookie.Value, &claims{}, func(at *jwt.Token) (interface{}, error) {
+		return []byte("ACCESS_TOKEN"), nil
+	})
 
-	// id := at["id"]
-	// fmt.Println(id)
-	return &User{}
+	if err != nil {
+		fmt.Println(err.Error())
+	}
+
+	// TODO HANDLE EXPIRATION
+	// if claims, ok := at.Claims.(*claims); ok && at.Valid {
+	if claims, ok := at.Claims.(*claims); ok {
+		return claims, nil
+	}
+
+	return nil, errors.New("could not parse token")
 }
 
 func SetTokenCookies(w http.ResponseWriter, u *User) {
