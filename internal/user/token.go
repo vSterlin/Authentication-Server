@@ -39,6 +39,7 @@ func newCookie(name string, value string) *http.Cookie {
 
 func generateRefreshTokenCookie(u *User) *http.Cookie {
 
+	// TODO fix expiration
 	rtSecret := []byte(os.Getenv("REFRESH_TOKEN_SECRET"))
 	c := newClaims(u, 100)
 
@@ -53,6 +54,7 @@ func generateRefreshTokenCookie(u *User) *http.Cookie {
 
 func generateAccesTokenCookie(u *User) *http.Cookie {
 
+	// TODO fix expiration
 	atSecret := []byte(os.Getenv("ACCESS_TOKEN_SECRET"))
 	c := newClaims(u, 1)
 
