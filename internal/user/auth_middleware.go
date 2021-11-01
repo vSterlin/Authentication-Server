@@ -14,18 +14,6 @@ func NewAuthMiddleware(us *UserService) *AuthMiddleware {
 	return &AuthMiddleware{us: us}
 }
 
-func (am *AuthMiddleware) IsAuthenticated(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-
-		if u := r.Context().Value(UserContext).(*User); u == nil {
-			http.Error(w, "Unauthorized", http.StatusUnauthorized)
-			return
-		}
-
-		next.ServeHTTP(w, r)
-	})
-}
-
 func (am *AuthMiddleware) CurrentUser(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		var u *User
@@ -37,8 +25,20 @@ func (am *AuthMiddleware) CurrentUser(next http.Handler) http.Handler {
 			claims, _ := ParseToken(cookie)
 			u = am.us.GetOne(claims.Id)
 		}
-		fmt.Printf("u: %+v\n", u)
+
 		ctx := context.WithValue(r.Context(), UserContext, u)
 		next.ServeHTTP(w, r.WithContext(ctx))
+	})
+}
+
+func (am *AuthMiddleware) IsAuthenticated(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+
+		if u := r.Context().Value(UserContext).(*User); u == nil {
+			http.Error(w, "Unauthorized", http.StatusUnauthorized)
+			return
+		}
+
+		next.ServeHTTP(w, r)
 	})
 }

@@ -4,13 +4,9 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"os"
 
 	"github.com/golang-jwt/jwt"
-)
-
-const (
-	ACCESS_TOKEN = iota
-	REFRESH_TOKEN
 )
 
 type claims struct {
@@ -43,7 +39,7 @@ func newCookie(name string, value string) *http.Cookie {
 
 func generateRefreshTokenCookie(u *User) *http.Cookie {
 
-	rtSecret := []byte("REFRESH_TOKEN")
+	rtSecret := []byte(os.Getenv("REFRESH_TOKEN"))
 	c := newClaims(u, 100)
 
 	rt := jwt.NewWithClaims(jwt.SigningMethodHS256, c)
@@ -57,7 +53,7 @@ func generateRefreshTokenCookie(u *User) *http.Cookie {
 
 func generateAccesTokenCookie(u *User) *http.Cookie {
 
-	atSecret := []byte("ACCESS_TOKEN")
+	atSecret := []byte(os.Getenv("ACCESS_TOKEN"))
 	c := newClaims(u, 1)
 
 	at := jwt.NewWithClaims(jwt.SigningMethodHS256, c)
@@ -71,7 +67,7 @@ func generateAccesTokenCookie(u *User) *http.Cookie {
 
 func ParseToken(cookie *http.Cookie) (*claims, error) {
 	at, err := jwt.ParseWithClaims(cookie.Value, &claims{}, func(at *jwt.Token) (interface{}, error) {
-		return []byte("ACCESS_TOKEN"), nil
+		return []byte(os.Getenv("ACCESS_TOKEN")), nil
 	})
 
 	if err != nil {
