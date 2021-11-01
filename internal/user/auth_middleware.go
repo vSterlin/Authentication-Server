@@ -2,7 +2,6 @@ package user
 
 import (
 	"context"
-	"fmt"
 	"net/http"
 )
 
@@ -19,11 +18,13 @@ func (am *AuthMiddleware) CurrentUser(next http.Handler) http.Handler {
 		var u *User
 
 		// get user by id from decoded jwt cookie
-		if cookie, err := r.Cookie("access_token"); err != nil {
-			fmt.Println(err.Error())
-		} else {
-			claims, _ := ParseToken(cookie)
-			u = am.us.GetOne(claims.Id)
+		// errors don't matter since if they are present
+		// will pass nil user to next handler
+		if cookie, _ := r.Cookie("access_token"); cookie != nil {
+			// if claims is nil user will remain nil
+			if claims, _ := ParseToken(cookie); claims != nil {
+				u = am.us.GetOne(claims.Id)
+			}
 		}
 
 		ctx := context.WithValue(r.Context(), UserContext, u)

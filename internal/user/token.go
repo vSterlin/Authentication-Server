@@ -71,10 +71,9 @@ func ParseToken(cookie *http.Cookie) (*claims, error) {
 	})
 
 	if err != nil {
-		fmt.Println(err.Error())
+		return nil, err
 	}
 
-	// TODO HANDLE EXPIRATION
 	// if claims, ok := at.Claims.(*claims); ok && at.Valid {
 	if claims, ok := at.Claims.(*claims); ok {
 		return claims, nil

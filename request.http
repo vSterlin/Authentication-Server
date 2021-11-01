@@ -1,0 +1,21 @@
+GET http://localhost:8080/users
+
+###
+
+POST http://localhost:8080/users/signup
+
+{
+  "firstName": "V",
+  "lastName": "S",
+  "username": "vs",
+  "email": "vs@vs.com",
+  "password": "password"
+}
+
+###
+POST http://localhost:8080/users/signin
+
+{
+  "email": "vs@vs.com",
+  "password": "password"
+}
