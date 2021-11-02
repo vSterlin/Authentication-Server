@@ -18,10 +18,12 @@ type Server struct {
 
 func NewServer(addr int, db *sql.DB) *Server {
 	strAddr := strconv.Itoa(addr)
-	return &Server{addr: strAddr}
+	return &Server{addr: strAddr, db: db}
 }
 
 func (s *Server) Init() {
+
+	s.db.Exec(user.CreateUserTableSQL)
 
 	ur := user.NewUserRepo(s.db)
 	us := user.NewUserService(ur)
