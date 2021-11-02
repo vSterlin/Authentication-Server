@@ -4,3 +4,8 @@
 * Sign Up
 * Sign In
 * Refresh Token for Authentication
+
+## Todo
+* Adding Postgres
+* Caching with Redis
+* More interactivity
