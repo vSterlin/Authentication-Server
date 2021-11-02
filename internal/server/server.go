@@ -1,6 +1,7 @@
 package server
 
 import (
+	"database/sql"
 	"net/http"
 	"strconv"
 
@@ -12,17 +13,17 @@ import (
 
 type Server struct {
 	addr string
-	// db *sql.DB
+	db   *sql.DB
 }
 
-func NewServer(addr int) *Server {
+func NewServer(addr int, db *sql.DB) *Server {
 	strAddr := strconv.Itoa(addr)
 	return &Server{addr: strAddr}
 }
 
 func (s *Server) Init() {
 
-	ur := user.NewUserRepo()
+	ur := user.NewUserRepo(s.db)
 	us := user.NewUserService(ur)
 	as := user.NewAuthService(us)
 	am := user.NewAuthMiddleware(us)
@@ -49,5 +50,5 @@ func (s *Server) Init() {
 }
 
 func (s *Server) Shutdown() {
-	// close db
+	s.db.Close()
 }

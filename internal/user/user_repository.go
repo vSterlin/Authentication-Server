@@ -1,5 +1,7 @@
 package user
 
+import "database/sql"
+
 var users = []*User{
 	{1, "Vladimir", "Sterlin", "vSterlin", "v@v.com", "hashedPassword"},
 }
@@ -11,10 +13,12 @@ type UserRepo interface {
 	InsertOne(u *User) *User
 }
 
-type userRepo struct{}
+type userRepo struct {
+	db *sql.DB
+}
 
-func NewUserRepo() *userRepo {
-	return &userRepo{}
+func NewUserRepo(db *sql.DB) *userRepo {
+	return &userRepo{db: db}
 }
 
 func (ur *userRepo) GetMany() []*User {
