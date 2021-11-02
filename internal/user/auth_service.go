@@ -40,3 +40,7 @@ func (as *AuthService) SignIn(email string, password string) (*User, error) {
 	return u, nil
 
 }
+
+func (as *AuthService) RefreshToken() {
+
+}

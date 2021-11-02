@@ -6,7 +6,7 @@ import (
 
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
-	mw "github.com/vSterlin/auth/internal/middleware"
+
 	"github.com/vSterlin/auth/internal/user"
 )
 
@@ -25,19 +25,23 @@ func (s *Server) Init() {
 	ur := user.NewUserRepo()
 	us := user.NewUserService(ur)
 	as := user.NewAuthService(us)
+	am := user.NewAuthMiddleware(us)
 	uc := user.NewUserController(us, as)
 
 	r := chi.NewRouter()
 
 	r.Use(middleware.Logger)
-	r.Use(mw.CurrentUser)
+	r.Use(am.CurrentUser)
 
 	r.Route("/users", func(r chi.Router) {
 
 		// r.Get("/", uc.GetUsers)
-		r.With(mw.IsAuthenticated).Get("/", uc.GetUsers)
+		r.With(am.IsAuthenticated).Get("/", uc.GetUsers)
+		r.Get("/current-user", uc.GetCurrentUser)
 		r.Post("/signup", uc.SignUp)
 		r.Post("/signin", uc.SignIn)
+
+		r.Get("/refresh-token", uc.RefreshToken)
 
 	})
 

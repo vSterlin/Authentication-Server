@@ -26,6 +26,7 @@ func (uc *UserController) SignUp(w http.ResponseWriter, r *http.Request) {
 
 	SetTokenCookies(w, u)
 
+	w.WriteHeader(http.StatusCreated)
 	json.NewEncoder(w).Encode(u)
 }
 
@@ -42,4 +43,27 @@ func (uc *UserController) SignIn(w http.ResponseWriter, r *http.Request) {
 	SetTokenCookies(w, u)
 
 	je.Encode(u)
+}
+
+func (uc *UserController) GetCurrentUser(w http.ResponseWriter, r *http.Request) {
+	u := r.Context().Value(UserContext).(*User)
+	json.NewEncoder(w).Encode(u)
+}
+
+// TODO
+func (uc *UserController) RefreshToken(w http.ResponseWriter, r *http.Request) {
+	if cookie, _ := r.Cookie("refresh_token"); cookie != nil {
+		if claims, err := ParseToken(cookie); claims != nil && err == nil {
+			u := uc.us.GetOne(claims.Id)
+			at := generateAccesTokenCookie(u)
+			http.SetCookie(w, at)
+			return
+		} else {
+			// if something went wrong with cookie clear it
+			c := newCookie("refresh_token", "")
+			http.SetCookie(w, c)
+		}
+	}
+
+	http.Error(w, "Unauthorized", http.StatusUnauthorized)
 }

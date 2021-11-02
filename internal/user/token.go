@@ -1,15 +1,18 @@
 package user
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
+	"os"
+	"time"
 
 	"github.com/golang-jwt/jwt"
 )
 
 const (
-	ACCESS_TOKEN = iota
-	REFRESH_TOKEN
+	ACCESS_TOKEN_SECRET  = "ACCESS_TOKEN_SECRET"
+	REFRESH_TOKEN_SECRET = "REFRESH_TOKEN_SECRET"
 )
 
 type claims struct {
@@ -19,13 +22,14 @@ type claims struct {
 	jwt.StandardClaims
 }
 
-func newClaims(u *User, exp int64) *claims {
+func newClaims(u *User, exp time.Duration) *claims {
+
 	return &claims{
 		u.Id,
 		u.Username,
 		u.Email,
 		jwt.StandardClaims{
-			ExpiresAt: exp,
+			ExpiresAt: time.Now().Add(exp).Unix(),
 			Issuer:    "vSterlin",
 		},
 	}
@@ -42,8 +46,9 @@ func newCookie(name string, value string) *http.Cookie {
 
 func generateRefreshTokenCookie(u *User) *http.Cookie {
 
-	rtSecret := []byte("REFRESH_TOKEN")
-	c := newClaims(u, 100)
+	// TODO fix expiration
+	rtSecret := []byte(os.Getenv(REFRESH_TOKEN_SECRET))
+	c := newClaims(u, 7*24*time.Hour)
 
 	rt := jwt.NewWithClaims(jwt.SigningMethodHS256, c)
 	rtStr, err := rt.SignedString(rtSecret)
@@ -56,8 +61,9 @@ func generateRefreshTokenCookie(u *User) *http.Cookie {
 
 func generateAccesTokenCookie(u *User) *http.Cookie {
 
-	atSecret := []byte("ACCESS_TOKEN")
-	c := newClaims(u, 1)
+	// TODO fix expiration
+	atSecret := []byte(os.Getenv(ACCESS_TOKEN_SECRET))
+	c := newClaims(u, 15*time.Second)
 
 	at := jwt.NewWithClaims(jwt.SigningMethodHS256, c)
 	atStr, err := at.SignedString(atSecret)
@@ -66,6 +72,29 @@ func generateAccesTokenCookie(u *User) *http.Cookie {
 	}
 
 	return newCookie("access_token", atStr)
+}
+
+func ParseToken(cookie *http.Cookie) (*claims, error) {
+
+	t, err := jwt.ParseWithClaims(cookie.Value, &claims{}, func(at *jwt.Token) (interface{}, error) {
+		s := ""
+		if cookie.Name == "access_token" {
+			s = os.Getenv(ACCESS_TOKEN_SECRET)
+		} else {
+			s = os.Getenv(REFRESH_TOKEN_SECRET)
+		}
+		return []byte(s), nil
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	if claims, ok := t.Claims.(*claims); ok && t.Valid {
+		return claims, nil
+	}
+
+	return nil, errors.New("could not parse token")
 }
 
 func SetTokenCookies(w http.ResponseWriter, u *User) {
