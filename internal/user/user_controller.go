@@ -20,9 +20,9 @@ func (uc *UserController) GetUsers(w http.ResponseWriter, r *http.Request) {
 }
 
 func (uc *UserController) SignUp(w http.ResponseWriter, r *http.Request) {
-	u := &User{}
-	json.NewDecoder(r.Body).Decode(&u)
-	u = uc.as.SignUp(u)
+	uwp := &UserWithPassword{}
+	json.NewDecoder(r.Body).Decode(&uwp)
+	u := uc.as.SignUp(uwp)
 
 	SetTokenCookies(w, u)
 
@@ -31,9 +31,9 @@ func (uc *UserController) SignUp(w http.ResponseWriter, r *http.Request) {
 }
 
 func (uc *UserController) SignIn(w http.ResponseWriter, r *http.Request) {
-	u := &User{}
-	json.NewDecoder(r.Body).Decode(&u)
-	u, err := uc.as.SignIn(u.Email, u.Password)
+	uwp := &UserWithPassword{}
+	json.NewDecoder(r.Body).Decode(&uwp)
+	u, err := uc.as.SignIn(uwp.Email, uwp.Password)
 	je := json.NewEncoder(w)
 	if err != nil {
 		je.Encode(err.Error())

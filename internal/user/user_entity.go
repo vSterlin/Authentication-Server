@@ -6,7 +6,11 @@ type User struct {
 	LastName  string `json:"lastName"`
 	Username  string `json:"username"`
 	Email     string `json:"email"`
-	Password  string `json:"password"` // TODO will omit later
+}
+
+type UserWithPassword struct {
+	User
+	Password string `json:"password"`
 }
 
 type ctx string
