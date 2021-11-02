@@ -24,11 +24,11 @@ func (mr *mockRepo) GetMany() []*User {
 }
 
 func (mr *mockRepo) GetOne(id int) *User {
-	return users[id-1]
+	return mockUsers[id-1]
 }
 
 func (ur *mockRepo) GetOneByEmail(email string) *User {
-	for _, u := range users {
+	for _, u := range mockUsers {
 		if u.Email == email {
 			return u
 		}
@@ -37,8 +37,8 @@ func (ur *mockRepo) GetOneByEmail(email string) *User {
 }
 
 func (mr *mockRepo) InsertOne(u *User) *User {
-	u.Id = len(users) + 1
-	users = append(users, u)
+	u.Id = len(mockUsers) + 1
+	mockUsers = append(mockUsers, u)
 	return u
 }
 

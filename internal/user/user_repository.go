@@ -2,14 +2,10 @@ package user
 
 import "database/sql"
 
-var users = []*User{
-	{1, "Vladimir", "Sterlin", "vSterlin", "v@v.com", "hashedPassword"},
-}
-
 const (
-	GetManySQL       = ``
-	GetOneSQL        = ``
-	GetOneByEmailSQL = ``
+	GetManySQL       = `SELECT id, first_name, last_name, username, email FROM users;`
+	GetOneSQL        = `SELECT id, first_name, last_name, username, email FROM users WHERE id = $1;`
+	GetOneByEmailSQL = `SELECT id, first_name, last_name, username, email FROM users WHERE email = $1;`
 	InsertOneSQL     = `INSERT INTO users (first_name, last_name, username, email, password) 
 											VALUES ($1, $2, $3, $4, $5) 
 											RETURNING id, first_name, last_name, username, email;`
@@ -31,20 +27,26 @@ func NewUserRepo(db *sql.DB) *userRepo {
 }
 
 func (ur *userRepo) GetMany() []*User {
+	rows, _ := ur.db.Query(GetManySQL)
+	users := []*User{}
+	for rows.Next() {
+		u := &User{}
+		rows.Scan(&u.Id, &u.FirstName, &u.LastName, &u.Username, &u.Email)
+		users = append(users, u)
+	}
 	return users
 }
 
 func (ur *userRepo) GetOne(id int) *User {
-	return users[id-1]
+	u := &User{}
+	ur.db.QueryRow(GetOneSQL, id).Scan(&u.Id, &u.FirstName, &u.LastName, &u.Username, &u.Email)
+	return u
 }
 
 func (ur *userRepo) GetOneByEmail(email string) *User {
-	for _, u := range users {
-		if u.Email == email {
-			return u
-		}
-	}
-	return nil
+	u := &User{}
+	ur.db.QueryRow(GetOneSQL, email).Scan(&u.Id, &u.FirstName, &u.LastName, &u.Username, &u.Email)
+	return u
 }
 
 func (ur *userRepo) InsertOne(u *User) *User {
