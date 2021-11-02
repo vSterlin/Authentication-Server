@@ -10,6 +10,11 @@ import (
 	"github.com/golang-jwt/jwt"
 )
 
+const (
+	ACCESS_TOKEN_SECRET  = "ACCESS_TOKEN_SECRET"
+	REFRESH_TOKEN_SECRET = "REFRESH_TOKEN_SECRET"
+)
+
 type claims struct {
 	Id       int    `json:"id"`
 	Username string `json:"username"`
@@ -42,7 +47,7 @@ func newCookie(name string, value string) *http.Cookie {
 func generateRefreshTokenCookie(u *User) *http.Cookie {
 
 	// TODO fix expiration
-	rtSecret := []byte(os.Getenv("REFRESH_TOKEN_SECRET"))
+	rtSecret := []byte(os.Getenv(REFRESH_TOKEN_SECRET))
 	c := newClaims(u, 7*24*time.Hour)
 
 	rt := jwt.NewWithClaims(jwt.SigningMethodHS256, c)
@@ -57,7 +62,7 @@ func generateRefreshTokenCookie(u *User) *http.Cookie {
 func generateAccesTokenCookie(u *User) *http.Cookie {
 
 	// TODO fix expiration
-	atSecret := []byte(os.Getenv("ACCESS_TOKEN_SECRET"))
+	atSecret := []byte(os.Getenv(ACCESS_TOKEN_SECRET))
 	c := newClaims(u, 15*time.Second)
 
 	at := jwt.NewWithClaims(jwt.SigningMethodHS256, c)
@@ -70,15 +75,22 @@ func generateAccesTokenCookie(u *User) *http.Cookie {
 }
 
 func ParseToken(cookie *http.Cookie) (*claims, error) {
-	at, err := jwt.ParseWithClaims(cookie.Value, &claims{}, func(at *jwt.Token) (interface{}, error) {
-		return []byte(os.Getenv("ACCESS_TOKEN_SECRET")), nil
+
+	t, err := jwt.ParseWithClaims(cookie.Value, &claims{}, func(at *jwt.Token) (interface{}, error) {
+		s := ""
+		if cookie.Name == "access_token" {
+			s = os.Getenv(ACCESS_TOKEN_SECRET)
+		} else {
+			s = os.Getenv(REFRESH_TOKEN_SECRET)
+		}
+		return []byte(s), nil
 	})
 
 	if err != nil {
 		return nil, err
 	}
 
-	if claims, ok := at.Claims.(*claims); ok && at.Valid {
+	if claims, ok := t.Claims.(*claims); ok && t.Valid {
 		return claims, nil
 	}
 

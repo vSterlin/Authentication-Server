@@ -41,6 +41,8 @@ func (s *Server) Init() {
 		r.Post("/signup", uc.SignUp)
 		r.Post("/signin", uc.SignIn)
 
+		r.Get("/refresh-token", uc.RefreshToken)
+
 	})
 
 	http.ListenAndServe(":"+s.addr, r)

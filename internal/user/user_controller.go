@@ -57,7 +57,12 @@ func (uc *UserController) RefreshToken(w http.ResponseWriter, r *http.Request) {
 			at := generateAccesTokenCookie(u)
 			http.SetCookie(w, at)
 			return
+		} else {
+			// if something went wrong with cookie clear it
+			c := newCookie("refresh_token", "")
+			http.SetCookie(w, c)
 		}
 	}
+
 	http.Error(w, "Unauthorized", http.StatusUnauthorized)
 }

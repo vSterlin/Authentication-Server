@@ -13,9 +13,14 @@ POST http://localhost:8080/users/signup
 }
 
 ###
+
 POST http://localhost:8080/users/signin
 
 {
   "email": "vs@vs.com",
   "password": "password"
 }
+
+### 
+
+GET http://localhost:8080/users/refresh-token
