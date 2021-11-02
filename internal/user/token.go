@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/golang-jwt/jwt"
 )
@@ -16,13 +17,14 @@ type claims struct {
 	jwt.StandardClaims
 }
 
-func newClaims(u *User, exp int64) *claims {
+func newClaims(u *User, exp time.Duration) *claims {
+
 	return &claims{
 		u.Id,
 		u.Username,
 		u.Email,
 		jwt.StandardClaims{
-			ExpiresAt: exp,
+			ExpiresAt: time.Now().Add(exp).Unix(),
 			Issuer:    "vSterlin",
 		},
 	}
@@ -41,7 +43,7 @@ func generateRefreshTokenCookie(u *User) *http.Cookie {
 
 	// TODO fix expiration
 	rtSecret := []byte(os.Getenv("REFRESH_TOKEN_SECRET"))
-	c := newClaims(u, 100)
+	c := newClaims(u, 7*24*time.Hour)
 
 	rt := jwt.NewWithClaims(jwt.SigningMethodHS256, c)
 	rtStr, err := rt.SignedString(rtSecret)
@@ -56,7 +58,7 @@ func generateAccesTokenCookie(u *User) *http.Cookie {
 
 	// TODO fix expiration
 	atSecret := []byte(os.Getenv("ACCESS_TOKEN_SECRET"))
-	c := newClaims(u, 1)
+	c := newClaims(u, 15*time.Second)
 
 	at := jwt.NewWithClaims(jwt.SigningMethodHS256, c)
 	atStr, err := at.SignedString(atSecret)
@@ -76,8 +78,7 @@ func ParseToken(cookie *http.Cookie) (*claims, error) {
 		return nil, err
 	}
 
-	// if claims, ok := at.Claims.(*claims); ok && at.Valid {
-	if claims, ok := at.Claims.(*claims); ok {
+	if claims, ok := at.Claims.(*claims); ok && at.Valid {
 		return claims, nil
 	}
 

@@ -22,7 +22,7 @@ func (am *AuthMiddleware) CurrentUser(next http.Handler) http.Handler {
 		// will pass nil user to next handler
 		if cookie, _ := r.Cookie("access_token"); cookie != nil {
 			// if claims is nil user will remain nil
-			if claims, _ := ParseToken(cookie); claims != nil {
+			if claims, err := ParseToken(cookie); claims != nil && err == nil {
 				u = am.us.GetOne(claims.Id)
 			}
 		}
