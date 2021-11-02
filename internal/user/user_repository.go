@@ -6,6 +6,15 @@ var users = []*User{
 	{1, "Vladimir", "Sterlin", "vSterlin", "v@v.com", "hashedPassword"},
 }
 
+const (
+	GetManySQL       = ``
+	GetOneSQL        = ``
+	GetOneByEmailSQL = ``
+	InsertOneSQL     = `INSERT INTO users (first_name, last_name, username, email, password) 
+											VALUES ($1, $2, $3, $4, $5) 
+											RETURNING id, first_name, last_name, username, email;`
+)
+
 type UserRepo interface {
 	GetMany() []*User
 	GetOne(id int) *User
@@ -39,7 +48,6 @@ func (ur *userRepo) GetOneByEmail(email string) *User {
 }
 
 func (ur *userRepo) InsertOne(u *User) *User {
-	u.Id = len(users) + 1
-	users = append(users, u)
+	ur.db.QueryRow(InsertOneSQL, u.FirstName, u.LastName, u.Username, u.Email, u.Password).Scan(&u.Id, &u.FirstName, &u.LastName, &u.Username, &u.Email)
 	return u
 }
