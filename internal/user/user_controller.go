@@ -48,3 +48,16 @@ func (uc *UserController) GetCurrentUser(w http.ResponseWriter, r *http.Request)
 	u := r.Context().Value(UserContext).(*User)
 	json.NewEncoder(w).Encode(u)
 }
+
+// TODO
+func (uc *UserController) RefreshToken(w http.ResponseWriter, r *http.Request) {
+	if cookie, _ := r.Cookie("refresh_token"); cookie != nil {
+		if claims, err := ParseToken(cookie); claims != nil && err == nil {
+			u := uc.us.GetOne(claims.Id)
+			at := generateAccesTokenCookie(u)
+			http.SetCookie(w, at)
+			return
+		}
+	}
+	http.Error(w, "Unauthorized", http.StatusUnauthorized)
+}
