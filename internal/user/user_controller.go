@@ -26,6 +26,7 @@ func (uc *UserController) SignUp(w http.ResponseWriter, r *http.Request) {
 
 	SetTokenCookies(w, u)
 
+	w.WriteHeader(http.StatusCreated)
 	json.NewEncoder(w).Encode(u)
 }
 
