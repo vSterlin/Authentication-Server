@@ -9,7 +9,7 @@ import (
 )
 
 var mockUsers = []*UserWithPassword{
-	{User{1, "Vladimir", "Sterlin", "vSterlin", "v@v.com"}, "p"},
+	{User: User{Id: 1, FirstName: "Vladimir", LastName: "Sterlin", Username: "vSterlin", Email: "v@v.com"}, Password: "password"},
 }
 
 type mockRepo struct {
