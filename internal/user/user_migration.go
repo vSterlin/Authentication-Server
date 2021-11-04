@@ -9,3 +9,7 @@ const CreateUserTableSQL = `
 	email VARCHAR,
 	password VARCHAR
 	);`
+
+const DropUserTableSQL = `
+	DROP TABLE users;
+	`

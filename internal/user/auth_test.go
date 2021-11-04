@@ -12,8 +12,7 @@ var mockUsers = []*UserWithPassword{
 	{User: User{Id: 1, FirstName: "Vladimir", LastName: "Sterlin", Username: "vSterlin", Email: "v@v.com"}, Password: "password"},
 }
 
-type mockRepo struct {
-}
+type mockRepo struct{}
 
 func mockCurrentUserMiddleware(next *http.Request) *http.Request {
 	return next.WithContext(context.WithValue(next.Context(), UserContext, &mockUsers[0].User))
