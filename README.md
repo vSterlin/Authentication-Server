@@ -10,5 +10,9 @@ This project is mainly for practicing building REST Api's with Go and implementi
 
 ## Todo
 * Adding Postgres
+* Reworking JWT authentication
 * Caching with Redis
 * More interactivity
+
+## Notes
+* Currently JWT token acts similar to session except it does not get stored on user and is not compared to.
