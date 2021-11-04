@@ -7,7 +7,8 @@ const CreateUserTableSQL = `
 	last_name VARCHAR, 
 	username VARCHAR,
 	email VARCHAR,
-	password VARCHAR
+	password VARCHAR,
+	refresh_token VARCHAR
 	);`
 
 const DropUserTableSQL = `
