@@ -8,17 +8,19 @@ import (
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
 
+	"github.com/vSterlin/auth/internal/cache"
 	"github.com/vSterlin/auth/internal/user"
 )
 
 type Server struct {
-	addr string
-	db   *sql.DB
+	addr  string
+	db    *sql.DB
+	cache cache.Cache
 }
 
-func NewServer(addr int, db *sql.DB) *Server {
+func NewServer(addr int, db *sql.DB, c cache.Cache) *Server {
 	strAddr := strconv.Itoa(addr)
-	return &Server{addr: strAddr, db: db}
+	return &Server{addr: strAddr, db: db, cache: c}
 }
 
 func (s *Server) Init() {
@@ -26,7 +28,8 @@ func (s *Server) Init() {
 	s.db.Exec(user.CreateUserTableSQL)
 
 	ur := user.NewUserRepo(s.db)
-	us := user.NewUserService(ur)
+	cur := user.NewCachedUserRepo(ur, s.cache)
+	us := user.NewUserService(cur)
 	as := user.NewAuthService(us)
 	am := user.NewAuthMiddleware(us)
 	uc := user.NewUserController(us, as)

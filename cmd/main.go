@@ -4,8 +4,10 @@ import (
 	"database/sql"
 	"fmt"
 
+	"github.com/go-redis/redis/v8"
 	_ "github.com/lib/pq"
 
+	"github.com/vSterlin/auth/internal/cache"
 	"github.com/vSterlin/auth/internal/config"
 	"github.com/vSterlin/auth/internal/server"
 )
@@ -22,7 +24,15 @@ func main() {
 
 	db.Ping()
 
-	s := server.NewServer(8080, db)
+	r := redis.NewClient(&redis.Options{
+		Addr:     "localhost:6379",
+		Password: "",
+		DB:       0,
+	})
+
+	c := cache.NewCache(r)
+
+	s := server.NewServer(8080, db, c)
 	s.Init()
 	defer s.Shutdown()
 
