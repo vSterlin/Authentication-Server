@@ -17,6 +17,7 @@ func (am *AuthMiddleware) CurrentUser(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		var u *User
 
+		// TODO remove database fetching and use data from token instead
 		// get user by id from decoded jwt cookie
 		// errors don't matter since if they are present
 		// will pass nil user to next handler

@@ -15,27 +15,28 @@ func NewAuthService(us *UserService) *AuthService {
 	return &AuthService{us}
 }
 
-func (as *AuthService) SignUp(u *User) *User {
+func (as *AuthService) SignUp(uwp *UserWithPassword) *User {
 	// TODO find if user with email exists
 
-	hp, err := bcrypt.GenerateFromPassword([]byte(u.Password), bcrypt.DefaultCost)
+	hp, err := bcrypt.GenerateFromPassword([]byte(uwp.Password), bcrypt.DefaultCost)
 
 	if err != nil {
 		fmt.Println(err)
 	}
 
-	u.Password = string(hp)
-	u = as.us.InsertOne(u)
+	uwp.Password = string(hp)
+	u := as.us.InsertOne(uwp)
 	return u
 }
 
 func (as *AuthService) SignIn(email string, password string) (*User, error) {
-	u := as.us.GetOneByEmail(email)
-	err := bcrypt.CompareHashAndPassword([]byte(u.Password), []byte(password))
+	uwp := as.us.GetOneByEmail(email)
+	err := bcrypt.CompareHashAndPassword([]byte(uwp.Password), []byte(password))
 
 	if err != nil {
 		return nil, errors.New("wrong email and password combination")
 	}
+	u := &uwp.User
 
 	return u, nil
 

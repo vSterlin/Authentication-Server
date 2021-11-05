@@ -8,27 +8,30 @@ import (
 	"testing"
 )
 
-var mockUsers = []*User{
-	{1, "Vladimir", "Sterlin", "vSterlin", "v@v.com", "hashedPassword"},
+var mockUsers = []*UserWithPassword{
+	{User: User{Id: 1, FirstName: "Vladimir", LastName: "Sterlin", Username: "vSterlin", Email: "v@v.com"}, Password: "password"},
 }
 
-type mockRepo struct {
-}
+type mockRepo struct{}
 
 func mockCurrentUserMiddleware(next *http.Request) *http.Request {
-	return next.WithContext(context.WithValue(next.Context(), UserContext, mockUsers[0]))
+	return next.WithContext(context.WithValue(next.Context(), UserContext, &mockUsers[0].User))
 }
 
 func (mr *mockRepo) GetMany() []*User {
-	return mockUsers
+	us := []*User{}
+	for _, u := range mockUsers {
+		us = append(us, &u.User)
+	}
+	return us
 }
 
 func (mr *mockRepo) GetOne(id int) *User {
-	return users[id-1]
+	return &mockUsers[id-1].User
 }
 
-func (ur *mockRepo) GetOneByEmail(email string) *User {
-	for _, u := range users {
+func (ur *mockRepo) GetOneByEmail(email string) *UserWithPassword {
+	for _, u := range mockUsers {
 		if u.Email == email {
 			return u
 		}
@@ -36,10 +39,10 @@ func (ur *mockRepo) GetOneByEmail(email string) *User {
 	return nil
 }
 
-func (mr *mockRepo) InsertOne(u *User) *User {
-	u.Id = len(users) + 1
-	users = append(users, u)
-	return u
+func (mr *mockRepo) InsertOne(u *UserWithPassword) *User {
+	u.Id = len(mockUsers) + 1
+	mockUsers = append(mockUsers, u)
+	return &u.User
 }
 
 func setupController() *UserController {
@@ -56,7 +59,7 @@ func TestSignUp(t *testing.T) {
 	uc := setupController()
 
 	w := httptest.NewRecorder()
-	u := &User{FirstName: "t", LastName: "t", Username: "t", Password: "t"}
+	u := &UserWithPassword{User: User{FirstName: "t", LastName: "t", Username: "t", Email: "e"}, Password: "t"}
 	json.NewEncoder(w).Encode(u)
 
 	initialP := u.Password
