@@ -1,22 +1,36 @@
 package user
 
 import (
+	"encoding/json"
+	"fmt"
+
 	"github.com/vSterlin/auth/internal/cache"
 )
 
 type cachedUserRepo struct {
-	ur    UserRepo
-	cache cache.Cache
+	ur UserRepo
+	c  cache.Cache
 }
 
 func NewCachedUserRepo(ur UserRepo, c cache.Cache) UserRepo {
-	return &cachedUserRepo{ur: ur, cache: c}
+	return &cachedUserRepo{ur: ur, c: c}
 }
 
 func (cur *cachedUserRepo) GetMany() []*User {
 	// get from cache
 	// if empty get by calling user repo's function
-	return cur.ur.GetMany()
+	users, err := cur.c.Get("users")
+
+	if err != nil {
+		u := cur.ur.GetMany()
+		cur.c.Set("users", u)
+		return u
+	}
+
+	fmt.Println("FROM CACHE")
+	u := []*User{}
+	json.Unmarshal([]byte(users), &u)
+	return u
 }
 
 func (cur *cachedUserRepo) GetOne(id int) *User {
