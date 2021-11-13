@@ -2,6 +2,7 @@ package server
 
 import (
 	"database/sql"
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -50,6 +51,7 @@ func (s *Server) Init() {
 
 	})
 
+	fmt.Printf("Listening on port %s\n", s.addr)
 	http.ListenAndServe(":"+s.addr, r)
 }
 
