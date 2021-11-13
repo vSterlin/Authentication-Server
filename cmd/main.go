@@ -3,6 +3,9 @@ package main
 import (
 	"database/sql"
 	"fmt"
+	"log"
+	"os"
+	"strconv"
 
 	"github.com/go-redis/redis/v8"
 	_ "github.com/lib/pq"
@@ -32,7 +35,12 @@ func main() {
 
 	c := cache.NewCache(r)
 
-	s := server.NewServer(8080, db, c)
+	port, err := strconv.Atoi(os.Getenv("PORT"))
+	if err != nil {
+		log.Fatalln("please provide a valid PORT number")
+	}
+
+	s := server.NewServer(port, db, c)
 	s.Init()
 	defer s.Shutdown()
 
