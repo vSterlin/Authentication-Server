@@ -74,6 +74,22 @@ func generateAccesTokenCookie(u *User) *http.Cookie {
 	return newCookie("access_token", atStr)
 }
 
+func SetRefreshTokenCookie(w http.ResponseWriter, u *User) {
+	rt := generateRefreshTokenCookie(u)
+
+	http.SetCookie(w, rt)
+}
+
+func SetAuthTokenCookie(w http.ResponseWriter, u *User) {
+	at := generateAccesTokenCookie(u)
+	http.SetCookie(w, at)
+}
+
+func SetTokenCookies(w http.ResponseWriter, u *User) {
+	SetRefreshTokenCookie(w, u)
+	SetAuthTokenCookie(w, u)
+}
+
 func ParseToken(cookie *http.Cookie) (*claims, error) {
 
 	t, err := jwt.ParseWithClaims(cookie.Value, &claims{}, func(at *jwt.Token) (interface{}, error) {
@@ -95,10 +111,4 @@ func ParseToken(cookie *http.Cookie) (*claims, error) {
 	}
 
 	return nil, errors.New("could not parse token")
-}
-
-func SetTokenCookies(w http.ResponseWriter, u *User) {
-	at, rt := generateAccesTokenCookie(u), generateRefreshTokenCookie(u)
-	http.SetCookie(w, at)
-	http.SetCookie(w, rt)
 }

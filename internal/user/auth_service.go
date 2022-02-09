@@ -30,10 +30,13 @@ func (as *AuthService) SignUp(uwp *UserWithPassword) *User {
 }
 
 func (as *AuthService) SignIn(email string, password string) (*User, error) {
-	uwp := as.us.GetOneByEmail(email)
+	uwp := as.us.GetOneByEmailWithPassword(email)
 	err := bcrypt.CompareHashAndPassword([]byte(uwp.Password), []byte(password))
+	fmt.Println(uwp)
+	fmt.Println(password)
 
 	if err != nil {
+		fmt.Println(err.Error())
 		return nil, errors.New("wrong email and password combination")
 	}
 	u := &uwp.User

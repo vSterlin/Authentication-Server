@@ -16,8 +16,12 @@ func (us *UserService) GetOne(id int) *User {
 	return us.ur.GetOne(id)
 }
 
-func (us *UserService) GetOneByEmail(email string) *UserWithPassword {
+func (us *UserService) GetOneByEmail(email string) *User {
 	return us.ur.GetOneByEmail(email)
+}
+
+func (us *UserService) GetOneByEmailWithPassword(email string) *UserWithPassword {
+	return us.ur.GetOneByEmailWithPassword(email)
 }
 
 func (us *UserService) InsertOne(u *UserWithPassword) *User {

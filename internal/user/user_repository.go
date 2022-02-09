@@ -1,12 +1,16 @@
 package user
 
-import "database/sql"
+import (
+	"database/sql"
+)
 
 const (
-	GetManySQL       = `SELECT id, first_name, last_name, username, email FROM users;`
-	GetOneSQL        = `SELECT id, first_name, last_name, username, email FROM users WHERE id = $1;`
-	GetOneByEmailSQL = `SELECT id, first_name, last_name, username, email FROM users WHERE email = $1;`
-	InsertOneSQL     = `INSERT INTO users (first_name, last_name, username, email, password) 
+	GetManySQL                   = `SELECT id, first_name, last_name, username, email FROM users;`
+	GetOneSQL                    = `SELECT id, first_name, last_name, username, email FROM users WHERE id = $1;`
+	GetOneByEmailSQL             = `SELECT id, first_name, last_name, username, email FROM users WHERE email = $1;`
+	GetOneByEmailWithPasswordSQL = `SELECT id, first_name, last_name, username, email, password FROM users WHERE email = $1;`
+
+	InsertOneSQL = `INSERT INTO users (first_name, last_name, username, email, password) 
 											VALUES ($1, $2, $3, $4, $5) 
 											RETURNING id, first_name, last_name, username, email;`
 )
@@ -14,7 +18,8 @@ const (
 type UserRepo interface {
 	GetMany() []*User
 	GetOne(id int) *User
-	GetOneByEmail(email string) *UserWithPassword
+	GetOneByEmail(email string) *User
+	GetOneByEmailWithPassword(email string) *UserWithPassword
 	InsertOne(u *UserWithPassword) *User
 }
 
@@ -43,9 +48,15 @@ func (ur *userRepo) GetOne(id int) *User {
 	return u
 }
 
-func (ur *userRepo) GetOneByEmail(email string) *UserWithPassword {
+func (ur *userRepo) GetOneByEmail(email string) *User {
+	u := &User{}
+	ur.db.QueryRow(GetOneByEmailSQL, email).Scan(&u.Id, &u.FirstName, &u.LastName, &u.Username, &u.Email)
+	return u
+}
+
+func (ur *userRepo) GetOneByEmailWithPassword(email string) *UserWithPassword {
 	uwp := &UserWithPassword{}
-	ur.db.QueryRow(GetOneSQL, email).Scan(&uwp.Id, &uwp.FirstName, &uwp.LastName, &uwp.Username, &uwp.Email)
+	ur.db.QueryRow(GetOneByEmailWithPasswordSQL, email).Scan(&uwp.Id, &uwp.FirstName, &uwp.LastName, &uwp.Username, &uwp.Email, &uwp.Password)
 	return uwp
 }
 

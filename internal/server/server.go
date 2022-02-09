@@ -26,6 +26,7 @@ func NewServer(addr int, db *sql.DB, c cache.Cache) *Server {
 
 func (s *Server) Init() {
 
+	s.db.Exec(user.DropUserTableSQL)
 	s.db.Exec(user.CreateUserTableSQL)
 
 	ur := user.NewUserRepo(s.db)
@@ -33,7 +34,7 @@ func (s *Server) Init() {
 	us := user.NewUserService(cur)
 	as := user.NewAuthService(us)
 	am := user.NewAuthMiddleware(us)
-	uc := user.NewUserController(us, as)
+	uh := user.NewUserHandler(us, as)
 
 	r := chi.NewRouter()
 
@@ -42,12 +43,12 @@ func (s *Server) Init() {
 
 	r.Route("/users", func(r chi.Router) {
 
-		r.With(am.IsAuthenticated).Get("/", uc.GetUsers)
-		r.Get("/current-user", uc.GetCurrentUser)
-		r.Post("/signup", uc.SignUp)
-		r.Post("/signin", uc.SignIn)
+		r.With(am.IsAuthenticated).Get("/", uh.GetUsers)
+		r.Get("/current-user", uh.GetCurrentUser)
+		r.Post("/signup", uh.SignUp)
+		r.Post("/signin", uh.SignIn)
 
-		r.Get("/refresh-token", uc.RefreshToken)
+		r.Get("/refresh-token", uh.RefreshToken)
 
 	})
 

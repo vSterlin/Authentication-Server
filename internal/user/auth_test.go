@@ -30,7 +30,16 @@ func (mr *mockRepo) GetOne(id int) *User {
 	return &mockUsers[id-1].User
 }
 
-func (ur *mockRepo) GetOneByEmail(email string) *UserWithPassword {
+func (ur *mockRepo) GetOneByEmail(email string) *User {
+	for _, u := range mockUsers {
+		if u.Email == email {
+			return &u.User
+		}
+	}
+	return nil
+}
+
+func (ur *mockRepo) GetOneByEmailWithPassword(email string) *UserWithPassword {
 	for _, u := range mockUsers {
 		if u.Email == email {
 			return u
@@ -45,12 +54,12 @@ func (mr *mockRepo) InsertOne(u *UserWithPassword) *User {
 	return &u.User
 }
 
-func setupController() *UserController {
+func setupController() *UserHandler {
 	ur := &mockRepo{}
 	us := NewUserService(ur)
 	as := NewAuthService(us)
 
-	uc := NewUserController(us, as)
+	uc := NewUserHandler(us, as)
 
 	return uc
 }

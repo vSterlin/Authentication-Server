@@ -38,8 +38,13 @@ func (cur *cachedUserRepo) GetOne(id int) *User {
 
 }
 
-func (cur *cachedUserRepo) GetOneByEmail(email string) *UserWithPassword {
+func (cur *cachedUserRepo) GetOneByEmail(email string) *User {
 	return cur.ur.GetOneByEmail(email)
+
+}
+
+func (cur *cachedUserRepo) GetOneByEmailWithPassword(email string) *UserWithPassword {
+	return cur.ur.GetOneByEmailWithPassword(email)
 
 }
 
