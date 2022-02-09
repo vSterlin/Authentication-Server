@@ -56,7 +56,9 @@ func generateRefreshTokenCookie(u *User) *http.Cookie {
 		fmt.Println(err.Error())
 	}
 
-	return newCookie("refresh_token", rtStr)
+	rc := newCookie("refresh_token", rtStr)
+	rc.Path = "/users/refresh-token"
+	return rc
 }
 
 func generateAccesTokenCookie(u *User) *http.Cookie {
@@ -76,7 +78,6 @@ func generateAccesTokenCookie(u *User) *http.Cookie {
 
 func SetRefreshTokenCookie(w http.ResponseWriter, u *User) {
 	rt := generateRefreshTokenCookie(u)
-
 	http.SetCookie(w, rt)
 }
 
